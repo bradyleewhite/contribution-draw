@@ -3,6 +3,7 @@ require('../../sass/app.scss');
 var HelloSayer = require('./HelloSayer');
 var React = require('react');
 
+
 class HelloForm extends React.Component {
 	constructor(props) {
 		super(props);
