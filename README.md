@@ -5,12 +5,10 @@ UI for making git contribution log awesome
 npm install
 
 ### CSS
-gulp sass
-and 
-gulp sass:watch
 
 ### Server
-cd public/
-python -m SimpleHTTPServer 3000
+"start": "./node_modules/http-server/bin/http-server -p 3000 .",
+"build": "NODE_ENV=production ./node_modules/webpack/bin/webpack.js -p",
+"watch": "./node_modules/webpack-dev-server/bin/webpack-dev-server.js --hot --progress --colors"
 
 

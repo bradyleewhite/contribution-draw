@@ -1,24 +1,9 @@
 
+// var ExtractTextPlugin = require('extract-text-webpack-plugin');
 
+var path = require('path');
 
-
-
-
-
-
-var ExtractTextPlugin = require('extract-text-webpack-plugin');
-
-
-var swig  = require('swig');
-
-var cdn = (process.env.NODE_ENV === 'production' ? '/' : 'http://localhost:8080/');
-
-swig.setDefaults({
-    locals: { // Global variables
-        cdn: cdn
-    }
-})
-
+var pathToSassLoader = path.resolve(__dirname, '../../index.js');
 
 
 function getEntrySources(sources) {
@@ -31,10 +16,6 @@ function getEntrySources(sources) {
 }
 
 
-
-
-
-
 module.exports = {
     entry: {
         index: getEntrySources([
@@ -45,22 +26,43 @@ module.exports = {
         publicPath: 'http://localhost:8080/',
         filename: 'public/[name].js'
     },
+    watch: true,
     module: {
+
+
+
         loaders: [
             { 
                 test: /\.js$/, 
                 loaders: ['react-hot', 'jsx', 'babel'], 
                 exclude: /node_modules/ 
             },
-            { 
-                test: /\.scss$/, 
-                loader: ExtractTextPlugin.extract('css!sass')
+            {
+                test   : /\.css$/,
+                loaders: ['style', 'css', 'resolve-url']
+            }, {
+                test   : /\.scss$/,
+                // loaders: ['style', 'css', 'resolve-url', 'sass?sourceMap']
+                loaders: ['style', 'css', 'resolve-url', 'sass?outputStyle=expanded&' +
+                    'includePaths[]=' + encodeURIComponent(path.resolve(__dirname, "./sass"))
+                ]
             }
         ]
-    },
-    plugins: [
-        new ExtractTextPlugin('public/style.css', {
-            allChunks: true
-        })
-    ]
+        // loaders: [
+        //     { 
+        //         test: /\.js$/, 
+        //         loaders: ['react-hot', 'jsx', 'babel'], 
+        //         exclude: /node_modules/ 
+        //     },
+        //     { 
+        //         test: /\.scss$/, 
+        //         loader: ExtractTextPlugin.extract('css!sass')
+        //     }
+        // ]
+    }//,
+    // plugins: [
+    //     new ExtractTextPlugin('public/style.css', {
+    //         allChunks: true
+    //     })
+    // ]
 };

@@ -1,7 +1,13 @@
 // require('../../sass/app.scss');
-require('../../sass/app.scss');
-var HelloSayer = require('./HelloSayer');
+
+
 var React = require('react');
+
+
+var HelloSayer = require('./HelloSayer');
+
+
+
 
 
 class HelloForm extends React.Component {
