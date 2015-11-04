@@ -13,7 +13,7 @@ var cellStates = {
 };
 
 
-var DataStruct = [
+var exampleDataStructure = [
 	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
 	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
 	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -26,41 +26,87 @@ var DataStruct = [
 
 
 
+
 var Main = React.createClass({
 	getInitialState: function(){
-		return {data:[], horiz: this.props.hCount, vert: this.props.vCount}
+		return {
+			data:[], 
+			horiz: 52, 
+			vert: 7,
+			size: 22,
+			padding: 1
+		}
 	},
 	render: function(){
-		return (<Group data={this.props}/>)
+
+		return (
+			<div>
+				<div>
+					<GridArea data={this.state}/>
+				</div>
+				<div>
+					<ToolsArea data={this.state} />
+				</div>
+			</div>
+			)
 	}
 });
 
-var Group = React.createClass({
+
+
+var ToolsArea = React.createClass({
 	getInitialState: function(){
-		var theGrid = [];
-		var rowz = 0;
-		for (var z = 0; z < this.props.data.vCount; z++) {
-			if(z !== 0){
-				rowz = rowz + 13;
-			}
-			var gridSection = [];
-			var colz = 0;
-			for (var i = 0; i < this.props.data.hCount; i++) {
-				if(i !== 0){
-					colz = colz + 13;
-				}
-			    gridSection.push(<Cell key={z+'-'+i} x={colz} y={rowz} id={z+'-'+i} />);
-			}
-			theGrid.push(<Row id={z} key={z} data={gridSection} />);
+		var radios = [];
+		var k = 0;
+		radios.push(<label htmlFor="auto"><input type="radio" name="ctrl" id="auto" value="auto" defaultChecked />Cycle Colors</label>);
+
+		for(var prop in cellStates){
+			k = k + 1;
+			radios.push(<label htmlFor={cellStates[prop]}><input disabled type="radio" name="ctrl" id={cellStates[prop]} value={prop} />{cellStates[prop]}</label>);
 		}
-		return {theGrid};
+
+		return {radios};
 	},
 	render: function(){
 		return (
-			<svg width="721" height="110">
-				{this.state.theGrid.map(function(item, eye) {
+			<div>
+				{this.state.radios.map(function(item, eye) {
+					return (
+						<span key={eye} style={{marginRight: '20px'}}>
+							{item}
+						</span>
+					);
+				})}
+			</div>
+		)
+	}
+});
+
+
+
+
+
+var GridArea = React.createClass({
+	getInitialState: function(){
+		var Grid = [];
+		var rowz = 0;
+		for (var z = 0; z < this.props.data.vert; z++) {
+			if(z !== 0){
+				rowz = rowz + (this.props.data.size +(this.props.data.padding * 2));
+			}
+			Grid.push(<Row id={z} row={rowz} key={z} data={this.props.data} />);
+		}
+		return {data:[], Grid};
+	},
+	getSize : function(x){
+		var i = (this.props.data.size +(this.props.data.padding * 2));
+		return (i * x);
+	},
+	render: function(){
+		return (
+			<svg width={this.getSize(this.props.data.horiz)} height={this.getSize(this.props.data.vert)}>
+				{this.state.Grid.map(function(item, eye) {
 					return item;
-					
 				})}
 			</svg>
 		)
@@ -69,11 +115,23 @@ var Group = React.createClass({
 
 
 var Row = React.createClass({
-
+	getInitialState: function(){
+		var gridSection = [];
+		var colz = 0;
+		var z = this.props.id;
+		var rowz = this.props.row;
+		for (var i = 0; i < this.props.data.horiz; i++) {
+			if(i !== 0){
+				colz = colz + (this.props.data.size +(this.props.data.padding * 2));
+			}
+		    gridSection.push(<Cell key={z+'-'+i} x={colz} y={rowz} data={this.props.data} id={z+'-'+i} />);
+		}
+		return {data:[], gridSection};
+	},
 	render: function() {
 		return (
 			<g id={this.props.id}>
-				{this.props.data.map(function(item, eye) {
+				{this.state.gridSection.map(function(item, eye) {
 					return item;
 				})}
 			</g>
@@ -95,7 +153,7 @@ var Cell = React.createClass({
 	},
 	render: function() {
 		return (
-			<rect id={this.props.id} x={this.props.x} y={this.props.y} onClick={this.onChangeState} fill={cellStates[this.state.CurrentState]} height={11} width={11}></rect>
+			<rect id={this.props.id} x={this.props.x} y={this.props.y} onClick={this.onChangeState} fill={cellStates[this.state.CurrentState]} height={this.props.data.size} width={this.props.data.size}></rect>
 			);
 	}
 });
@@ -104,5 +162,4 @@ var Cell = React.createClass({
 
 
 
-
-ReactDOM.render(<Main hCount={52} vCount={7} />, document.getElementById('app'));
+ReactDOM.render(<Main />, document.getElementById('app'));
