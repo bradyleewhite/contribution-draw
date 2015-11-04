@@ -12,10 +12,6 @@ var cellStates = {
 	4 : "#1e6823"
 };
 
-var colCount = 52;
-var rowCount = 7;
-
-
 
 var DataStruct = [
 	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -28,8 +24,6 @@ var DataStruct = [
 ];
 
 
-// 52 total in row
-var dataRow = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 
 
 var Main = React.createClass({
@@ -37,45 +31,55 @@ var Main = React.createClass({
 		return {data:[], horiz: this.props.hCount, vert: this.props.vCount}
 	},
 	render: function(){
-		return <Group data={this.props}/>
+		return (<Group data={this.props}/>)
 	}
 });
 
-
-// 0, 13, 26 , 39 --- > 700ish
-
 var Group = React.createClass({
 	getInitialState: function(){
-		var theGrid = {};
+		var theGrid = [];
 		var rowz = 0;
-		for (var z = 0; z < rowCount; z++) {
+		for (var z = 0; z < this.props.data.vCount; z++) {
 			if(z !== 0){
 				rowz = rowz + 13;
 			}
 			var gridSection = [];
 			var colz = 0;
-			for (var i = 0; i < colCount; i++) {
+			for (var i = 0; i < this.props.data.hCount; i++) {
 				if(i !== 0){
 					colz = colz + 13;
 				}
-			    gridSection[i] = {id: z+'-'+i, x: colz, y: rowz};
+			    gridSection.push(<Cell key={z+'-'+i} x={colz} y={rowz} id={z+'-'+i} />);
 			}
-			theGrid[z] = gridSection;
+			theGrid.push(<Row id={z} key={z} data={gridSection} />);
 		}
-		return theGrid;
+		return {theGrid};
 	},
 	render: function(){
-		var rows = this.state[0];
 		return (
 			<svg width="721" height="110">
-				{rows.map(function(item, eye) {
-					return <Cell key={item.id} data={item} />
+				{this.state.theGrid.map(function(item, eye) {
+					return item;
+					
 				})}
 			</svg>
 		)
 	}
 });
 
+
+var Row = React.createClass({
+
+	render: function() {
+		return (
+			<g id={this.props.id}>
+				{this.props.data.map(function(item, eye) {
+					return item;
+				})}
+			</g>
+		)
+	}
+});
 
 
 var Cell = React.createClass({
@@ -91,7 +95,7 @@ var Cell = React.createClass({
 	},
 	render: function() {
 		return (
-			<rect y={this.props.data.y} x={this.props.data.x} onClick={this.onChangeState} fill={cellStates[this.state.CurrentState]} height={11} width={11}></rect>
+			<rect id={this.props.id} x={this.props.x} y={this.props.y} onClick={this.onChangeState} fill={cellStates[this.state.CurrentState]} height={11} width={11}></rect>
 			);
 	}
 });
