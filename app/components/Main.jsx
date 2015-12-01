@@ -71,6 +71,8 @@ var ToolsArea = React.createClass({
 		}
 		return {radios};
 	},
+
+
 	render: function(){
 		return (
 			<div>
@@ -81,7 +83,9 @@ var ToolsArea = React.createClass({
 						</span>
 					);
 				})}
+				<button onClick={Row.getInitialState}>Clear</button>
 			</div>
+
 		)
 	}
 });
@@ -132,7 +136,7 @@ var GridArea = React.createClass({
 	},
 	render: function(){
 		return (
-			<svg  width={this.getSize(this.props.data.horiz)} height={this.getSize(this.props.data.vert)}>
+			<svg key={this.state.timestamp} width={this.getSize(this.props.data.horiz)} height={this.getSize(this.props.data.vert)}>
 				{this.state.Grid.map(function(item, eye) {
 					return item;
 				})}
@@ -186,20 +190,21 @@ var Cell = React.createClass({
 			this.setState({CurrentState: radio_state});
 		}
 	},
+	onReset: function(){
+		this.setState({CurrentState: 0});
+	},
 	render: function() {
 
 		console.log(this);
-		return (
-			<rect
-				id		= {this.props.id}
-				x		= {this.props.x}
-				y		= {this.props.y}
-				onClick	= {this.onChangeState}
-				fill	= {cellStates[this.state.CurrentState]}
-				height	= {this.props.data.size}
-				width	= {this.props.data.size}
-			/>
-			  );
+		return (<rect
+			id		= {this.props.id}
+			x		= {this.props.x}
+			y		= {this.props.y}
+			onClick	= {this.onChangeState}
+			fill	= {cellStates[this.state.CurrentState]}
+			height	= {this.props.data.size}
+			width	= {this.props.data.size}
+		/>);
 	}
 });
 
