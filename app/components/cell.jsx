@@ -14,7 +14,7 @@ var Cell = React.createClass({
 	getInitialState: function(){
 		return {state:0, color: cellStates[0]}
 	},
-	onStateChange: function(e){
+	onStateChange: function(e) {
 		var i = e.target.state + 1;
 		if(!cellStates[i]){
 			i = 0;
@@ -33,14 +33,10 @@ var Cell = React.createClass({
 });
 
 
-var CellState React.createClass({
+var CellState = React.createClass({
 	render: function() {
 		return (
-			
-				<CellState />
-			
-
-
+			<CellState />
 		);
 	}
 });

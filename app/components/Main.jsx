@@ -2,8 +2,6 @@ var React = require('react');
 var ReactDOM = require('react-dom');
 
 
-
-
 var cellStates = {
 	0 : "#eeeeee",
 	1 : "#d6e685",
@@ -11,6 +9,12 @@ var cellStates = {
 	3 : "#44a340",
 	4 : "#1e6823"
 };
+
+
+
+
+var mouseIsDown = false;
+
 
 
 var exampleDataStructure = [
@@ -25,8 +29,6 @@ var exampleDataStructure = [
 
 
 
-
-
 var Main = React.createClass({
 	getInitialState: function(){
 		return {
@@ -38,7 +40,6 @@ var Main = React.createClass({
 		}
 	},
 	render: function(){
-
 		return (
 			<div>
 				<div>
@@ -48,10 +49,9 @@ var Main = React.createClass({
 					<ToolsArea data={this.state} />
 				</div>
 			</div>
-			)
+		)
 	}
 });
-
 
 
 var ToolsArea = React.createClass({
@@ -62,9 +62,13 @@ var ToolsArea = React.createClass({
 
 		for(var prop in cellStates){
 			k = k + 1;
-			radios.push(<label htmlFor={cellStates[prop]}><input disabled type="radio" name="ctrl" id={cellStates[prop]} value={prop} />{cellStates[prop]}</label>);
+			radios.push(
+				<label htmlFor={cellStates[prop]}>
+					<input type="radio" name="ctrl" id={cellStates[prop]} value={prop} />
+					<span style={{backgroundColor: cellStates[prop]}}>{cellStates[prop]}</span>
+				</label>
+			);
 		}
-
 		return {radios};
 	},
 	render: function(){
@@ -83,7 +87,28 @@ var ToolsArea = React.createClass({
 });
 
 
+//$(document).on('mousedown', function() {
+//	mouseIsDown = true;
+//});
+//
+//$(document).on('mouseup', function() {
+//	mouseIsDown = false;
+//});
 
+
+
+function getRadioValue(groupName) {
+	var radios = document.getElementsByName(groupName);
+	var retValue = 'auto';
+	for (var i=0; i<radios.length; i++) {
+		var someRadio = radios[i];
+		if (someRadio.checked) {
+			retValue = someRadio.value;
+		}
+	}
+	return retValue;
+
+}
 
 
 var GridArea = React.createClass({
@@ -98,13 +123,16 @@ var GridArea = React.createClass({
 		}
 		return {data:[], Grid};
 	},
+
+
+
 	getSize : function(x){
 		var i = (this.props.data.size +(this.props.data.padding * 2));
 		return (i * x);
 	},
 	render: function(){
 		return (
-			<svg width={this.getSize(this.props.data.horiz)} height={this.getSize(this.props.data.vert)}>
+			<svg  width={this.getSize(this.props.data.horiz)} height={this.getSize(this.props.data.vert)}>
 				{this.state.Grid.map(function(item, eye) {
 					return item;
 				})}
@@ -145,20 +173,35 @@ var Cell = React.createClass({
 		return {CurrentState:0}
 	},
 	onChangeState: function (e){
-		var i = this.state.CurrentState + 1;
-		if(!cellStates[i]){
-			i = 0;
+
+		var radio_state = getRadioValue('ctrl');
+
+		if (radio_state === 'auto') {
+			var i = this.state.CurrentState + 1;
+			if (!cellStates[i]) {
+				i = 0;
+			}
+			this.setState({CurrentState: i});
+		} else {
+			this.setState({CurrentState: radio_state});
 		}
-		this.setState({CurrentState:i});
 	},
 	render: function() {
+
+		console.log(this);
 		return (
-			<rect id={this.props.id} x={this.props.x} y={this.props.y} onClick={this.onChangeState} fill={cellStates[this.state.CurrentState]} height={this.props.data.size} width={this.props.data.size}></rect>
-			);
+			<rect
+				id		= {this.props.id}
+				x		= {this.props.x}
+				y		= {this.props.y}
+				onClick	= {this.onChangeState}
+				fill	= {cellStates[this.state.CurrentState]}
+				height	= {this.props.data.size}
+				width	= {this.props.data.size}
+			/>
+			  );
 	}
 });
-
-
 
 
 
