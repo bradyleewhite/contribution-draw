@@ -17,36 +17,32 @@ var mouseIsDown = false;
 
 
 
-var exampleDataStructure = [
-	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-];
-
-
-
 var Main = React.createClass({
 	getInitialState: function(){
 		return {
-			data:[], 
-			horiz: 52, 
+			data:[],
+			horiz: 52,
 			vert: 7,
-			size: 22,
-			padding: 1
+			size: 13,
+			padding: 1,
+			mouseDown: false
 		}
 	},
+	resetGrid: function (){
+		console.log(this.props);
+	},
 	render: function(){
+
 		return (
 			<div>
 				<div>
 					<GridArea data={this.state}/>
 				</div>
 				<div>
-					<ToolsArea data={this.state} />
+					<Radios data={this.state} />
+
+					<button onClick={this.resetGrid}>Clear</button>
+					
 				</div>
 			</div>
 		)
@@ -54,7 +50,7 @@ var Main = React.createClass({
 });
 
 
-var ToolsArea = React.createClass({
+var Radios = React.createClass({
 	getInitialState: function(){
 		var radios = [];
 		var k = 0;
@@ -71,8 +67,6 @@ var ToolsArea = React.createClass({
 		}
 		return {radios};
 	},
-
-
 	render: function(){
 		return (
 			<div>
@@ -83,9 +77,7 @@ var ToolsArea = React.createClass({
 						</span>
 					);
 				})}
-				<button onClick={Row.getInitialState}>Clear</button>
 			</div>
-
 		)
 	}
 });
@@ -121,22 +113,19 @@ var GridArea = React.createClass({
 		var rowz = 0;
 		for (var z = 0; z < this.props.data.vert; z++) {
 			if(z !== 0){
-				rowz = rowz + (this.props.data.size +(this.props.data.padding * 2));
+				rowz = rowz + (this.props.data.size +(this.props.data.padding));
 			}
 			Grid.push(<Row id={z} row={rowz} key={z} data={this.props.data} />);
 		}
 		return {data:[], Grid};
 	},
-
-
-
 	getSize : function(x){
 		var i = (this.props.data.size +(this.props.data.padding * 2));
 		return (i * x);
 	},
 	render: function(){
 		return (
-			<svg key={this.state.timestamp} width={this.getSize(this.props.data.horiz)} height={this.getSize(this.props.data.vert)}>
+			<svg width={this.getSize(this.props.data.horiz)} height={this.getSize(this.props.data.vert)}>
 				{this.state.Grid.map(function(item, eye) {
 					return item;
 				})}
@@ -154,7 +143,7 @@ var Row = React.createClass({
 		var rowz = this.props.row;
 		for (var i = 0; i < this.props.data.horiz; i++) {
 			if(i !== 0){
-				colz = colz + (this.props.data.size +(this.props.data.padding * 2));
+				colz = colz + (this.props.data.size +(this.props.data.padding));
 			}
 		    gridSection.push(<Cell key={z+'-'+i} x={colz} y={rowz} data={this.props.data} id={z+'-'+i} />);
 		}
@@ -176,34 +165,42 @@ var Cell = React.createClass({
 	getInitialState: function(){
 		return {CurrentState:0}
 	},
-	onChangeState: function (e){
-
+	onChangeState: function (){
+		var next_state = this.state.CurrentState + 1;
 		var radio_state = getRadioValue('ctrl');
-
 		if (radio_state === 'auto') {
-			var i = this.state.CurrentState + 1;
-			if (!cellStates[i]) {
-				i = 0;
+			if (!cellStates[next_state]) {
+				next_state = 0;
 			}
-			this.setState({CurrentState: i});
 		} else {
-			this.setState({CurrentState: radio_state});
+			next_state = radio_state;
+		}
+		this.setState({CurrentState: next_state});
+	},
+	onMouseEnter: function(){
+		if (this.props.data.mouseDown){
+			this.onChangeState();
 		}
 	},
-	onReset: function(){
-		this.setState({CurrentState: 0});
+	onMouseDown: function(){
+		this.props.data.mouseDown = true;
+	},
+	onMouseUp: function(){
+		this.props.data.mouseDown = false;
 	},
 	render: function() {
-
-		console.log(this);
 		return (<rect
-			id		= {this.props.id}
-			x		= {this.props.x}
-			y		= {this.props.y}
-			onClick	= {this.onChangeState}
-			fill	= {cellStates[this.state.CurrentState]}
-			height	= {this.props.data.size}
-			width	= {this.props.data.size}
+			id			= {this.props.id}
+			x			= {this.props.x}
+			y			= {this.props.y}
+			style		= {{strokeWidth: this.props.data.padding + 'px', stroke: '#ffffff'}}
+			onClick		= {this.onChangeState}
+			onMouseEnter= {this.onMouseEnter}
+			onMouseDown = {this.onMouseDown}
+			onMouseUp 	= {this.onMouseUp}
+			fill		= {cellStates[this.state.CurrentState]}
+			height		= {this.props.data.size}
+			width		= {this.props.data.size}
 		/>);
 	}
 });
