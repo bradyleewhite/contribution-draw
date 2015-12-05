@@ -11,11 +11,21 @@ var cellStates = {
 };
 
 
+var exampleDataStructure = [
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+];
 
+//console.log('exampleDataStructure',exampleDataStructure);
 
 var mouseIsDown = false;
 
-
+var fuck;
 
 var Main = React.createClass({
 	getInitialState: function(){
@@ -23,26 +33,58 @@ var Main = React.createClass({
 			data:[],
 			horiz: 52,
 			vert: 7,
-			size: 13,
+			size: 20,
+			smallGrid: 13,
+			largeGrid: 20,
 			padding: 1,
 			mouseDown: false
 		}
 	},
-	resetGrid: function (){
-		console.log(this.props);
+	updateReturnValue: function (row, cell, val){
+
+		var gitSet = this.gitData[row][cell] = val;
+
+
+		this.setState(gitSet);
 	},
+	resetGrid: function (){
+		//console.log(this.props);
+	},
+	onSizeChange: function (event){
+		this.setState({size:  parseInt(event.target.value)});
+	},
+
+
 	render: function(){
 
+		var sm = (this.state.smallGrid === this.state.size) ? 'btn btn-default active': 'btn btn-default';
+		var lg = (this.state.largeGrid === this.state.size) ? 'btn btn-default active': 'btn btn-default';
 		return (
 			<div>
+				<div className="page-header">
+					<div className={'btn-group'} role="group">
+						<button type="button"
+								className={sm}
+								value={this.state.smallGrid}
+								onClick={this.onSizeChange}>
+							Small
+						</button>
+						<button type="button"
+								className={lg}
+								value={this.state.largeGrid}
+								onClick={this.onSizeChange}>
+							Large
+						</button>
+					</div>
+				</div>
+
 				<div>
 					<GridArea data={this.state}/>
 				</div>
 				<div>
 					<Radios data={this.state} />
-
+					<br />
 					<button onClick={this.resetGrid}>Clear</button>
-					
 				</div>
 			</div>
 		)
@@ -83,14 +125,6 @@ var Radios = React.createClass({
 });
 
 
-//$(document).on('mousedown', function() {
-//	mouseIsDown = true;
-//});
-//
-//$(document).on('mouseup', function() {
-//	mouseIsDown = false;
-//});
-
 
 
 function getRadioValue(groupName) {
@@ -109,25 +143,48 @@ function getRadioValue(groupName) {
 
 var GridArea = React.createClass({
 	getInitialState: function(){
-		var Grid = [];
-		var rowz = 0;
-		for (var z = 0; z < this.props.data.vert; z++) {
-			if(z !== 0){
-				rowz = rowz + (this.props.data.size +(this.props.data.padding));
+		var grid = [];
+		for (var y = 0; y < this.props.data.vert; y++) {
+			var row = [];
+			for (var x = 0; x < this.props.data.horiz; x++) {
+				row.push({value:0});
 			}
-			Grid.push(<Row id={z} row={rowz} key={z} data={this.props.data} />);
+			grid.push(row);
 		}
-		return {data:[], Grid};
+		return {grid}
 	},
 	getSize : function(x){
 		var i = (this.props.data.size +(this.props.data.padding * 2));
 		return (i * x);
 	},
+	updateValue: function(row, cell, value){
+
+	},
 	render: function(){
+		var prop = this.props,
+		offSet = this.props.data.size +(this.props.data.padding * 2),
+		yPos = (0 - offSet);
 		return (
 			<svg width={this.getSize(this.props.data.horiz)} height={this.getSize(this.props.data.vert)}>
-				{this.state.Grid.map(function(item, eye) {
-					return item;
+				{this.state.grid.map(function(Row, i) {
+					var xPos = (0 - offSet);
+					yPos += offSet;
+					return (
+						<g id={i} key={i}>
+							{Row.map(function(item2, eye2) {
+								return (<Cell
+									key			= {i+'-'+eye2}
+									rowCount	= {i}
+									cellCount	= {eye2}
+									x			= {xPos += offSet}
+									y			= {yPos}
+									data		= {prop.data}
+									id			= {i+'-'+eye2}
+									value		= {item2.value}
+								/>);
+							})}
+						</g>
+					)
 				})}
 			</svg>
 		)
@@ -135,35 +192,11 @@ var GridArea = React.createClass({
 });
 
 
-var Row = React.createClass({
-	getInitialState: function(){
-		var gridSection = [];
-		var colz = 0;
-		var z = this.props.id;
-		var rowz = this.props.row;
-		for (var i = 0; i < this.props.data.horiz; i++) {
-			if(i !== 0){
-				colz = colz + (this.props.data.size +(this.props.data.padding));
-			}
-		    gridSection.push(<Cell key={z+'-'+i} x={colz} y={rowz} data={this.props.data} id={z+'-'+i} />);
-		}
-		return {data:[], gridSection};
-	},
-	render: function() {
-		return (
-			<g id={this.props.id}>
-				{this.state.gridSection.map(function(item, eye) {
-					return item;
-				})}
-			</g>
-		)
-	}
-});
-
-
 var Cell = React.createClass({
 	getInitialState: function(){
-		return {CurrentState:0}
+		return {
+			CurrentState:0
+		}
 	},
 	onChangeState: function (){
 		var next_state = this.state.CurrentState + 1;
@@ -176,6 +209,10 @@ var Cell = React.createClass({
 			next_state = radio_state;
 		}
 		this.setState({CurrentState: next_state});
+		console.log('this ',this);
+		//[this.props.value = next_state;
+
+		//exampleDataStructure[this.props.rowCount][this.props.cellCount] = next_state;
 	},
 	onMouseEnter: function(){
 		if (this.props.data.mouseDown){
@@ -189,6 +226,7 @@ var Cell = React.createClass({
 		this.props.data.mouseDown = false;
 	},
 	render: function() {
+//console.log('********************************************************',this.props);
 		return (<rect
 			id			= {this.props.id}
 			x			= {this.props.x}
@@ -201,6 +239,7 @@ var Cell = React.createClass({
 			fill		= {cellStates[this.state.CurrentState]}
 			height		= {this.props.data.size}
 			width		= {this.props.data.size}
+			value 		= {this.state.CurrentState}
 		/>);
 	}
 });
