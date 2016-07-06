@@ -4,12 +4,6 @@ var ReactDOM = require('react-dom');
 
 
 
-var App = require('./components/App.jsx');
-
-
-console.log(App);
-
-
 
 var Entry = React.createClass({
     render: function() {
